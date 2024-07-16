@@ -1,0 +1,42 @@
+[global]
+exten => 900, 1, (ivr_1, s, 1)
+
+IVR ( Interactive Voice Response )
+
+[ivr_1]
+exten => s, 1, Answer()
+exten => s, 2, Set(TIMEOUT(response)=10)
+exten => s, 3, PLAYBACK(custom/ivr) #ato le robot no miresaka
+exten => s, 4, WaitExten
+
+exten => 1, 1, Dial(SIP/100)
+exten => 2, 1, Dial(SIP/101)
+exten => 3, 1, Dial(SIP/102)
+exten => _[05-#*], 1, Goto(ivr_1, s, 1)
+
+exten => t, 1, Goto(ivr_1, s, 3)
+
+
+[HOME]
+include => global
+
+[WORK]
+include => global
+
+[ivr_1]
+exten => s, 1, Answer()
+exten => s, 2, Set(TIMEOUT(response)=10)
+exten => s, 3, agi(googletts.agi, “Bonjour”, fr,any)
+exten => s, 4, agi(googletts.agi, “Taper 1 pour appeler 100”, fr, any)
+exten => s, 5, agi(googletts.agi, “Taper 2 pour appeler 101”, fr, any)
+exten => s, 6, agi(googletts.agi, “Taper 3 pour appeler 102”, fr, any)
+exten => s, 7, WaitExten()
+
+exten => 1, 1, Goto(HOME, 100, 1)
+exten => 2, 1, Goto(HOME, 101, 1)
+exten => 3, 1, Goto(HOME, 102, 1)
+
+exten => _[04-*#], 1, agi(googletts.agi, “Choix invalide”, fr, any)
+exten => _[04-*#], 2, Goto(ivr_1, s, 1)
+
+exten => t, s, Goto[ivr_1, s, 1]
